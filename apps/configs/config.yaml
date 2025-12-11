@@ -1,0 +1,12 @@
+server:
+  host: localhost
+  post: 8081
+  mode: debug
+
+datasource:
+  mysql:
+    host: 47.94.210.86
+    post: 3306
+    username: root
+    password: 123
+    database: bms
