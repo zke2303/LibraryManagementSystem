@@ -4,9 +4,8 @@ server:
   mode: debug
 
 datasource:
-  mysql:
-    host: 47.94.210.86
-    post: 3306
-    username: root
-    password: 123
-    database: bms
+  host: 47.110.74.7
+  port: 3306
+  user: root
+  password: 123
+  name: bms
