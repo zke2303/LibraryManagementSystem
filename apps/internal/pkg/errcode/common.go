@@ -11,6 +11,7 @@ var (
 	// 用户模块
 	UserNameEmpty      = NewError(10001, "用户名不能为空")
 	PasswordEmpty      = NewError(10002, "密码不能为空")
-	EmailFormatErr     = NewError(10003, "邮箱格式错误")
-	UserNameDuplicated = NewError(10004, "用户名重复")
+	EmailFormatErr     = NewError(10003, "请检查邮箱格式")
+	UserNameDuplicated = NewError(10004, "用户名已被注册")
+	EmailDuplicated    = NewError(10005, "邮箱已被注册")
 )

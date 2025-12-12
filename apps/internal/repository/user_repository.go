@@ -5,20 +5,14 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/zhang/LibraryMS/internal/model"
+	"github.com/zhang/LibraryMS/internal/pkg/errcode"
 	"gorm.io/gorm"
-)
-
-var (
-	ErrDuplicateKey = errors.New("duplicate key")
-	ErrInternal     = errors.New("internal server error")
-	ErrNotFound     = errors.New("not found")
 )
 
 type IUserRepository interface {
 	FindById(id uint64) (*model.User, error)
 	CreateUser(user *model.User) error
 	DeleteUser(id uint64) error
-	UpdateUser(id uint64, updates map[string]interface{}) error
 }
 
 type UserRepositoryImpl struct {
@@ -42,9 +36,9 @@ func (repo UserRepositoryImpl) FindById(id uint64) (*model.User, error) {
 	if err != nil {
 		// 判断错误类型
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrNotFound
+			return nil, errcode.NotFound
 		}
-		return nil, ErrInternal
+		return nil, errcode.InternalError
 	}
 	return &user, nil
 }
@@ -56,9 +50,9 @@ func (repo UserRepositoryImpl) CreateUser(user *model.User) error {
 	if err := repo.db.Create(user).Error; err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			return ErrDuplicateKey
+			return err
 		}
-		return err
+		return errcode.InternalError
 	}
 	return nil
 }
@@ -70,28 +64,11 @@ func (repo UserRepositoryImpl) DeleteUser(id uint64) error {
 	result := repo.db.Delete(&model.User{}, id)
 	// 2.判断是否发生错误
 	if result.Error != nil {
-		return ErrInternal
+		return errcode.InternalError
 	}
 
 	if result.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
-}
-
-// UpdateUser
-// 更新用户信息
-func (repo UserRepositoryImpl) UpdateUser(id uint64, updates map[string]interface{}) error {
-	// 1.调用数据库操作
-	result := repo.db.Model(&model.User{}).Where("id = ?", id).Updates(updates)
-	// 2.判断错误类型
-	if result.Error != nil {
-		return ErrInternal
-	}
-
-	if result.RowsAffected == 0 {
-		return ErrNotFound
+		return errcode.NotFound
 	}
 
 	return nil
