@@ -14,4 +14,8 @@ var (
 	EmailFormatErr     = NewError(10003, "请检查邮箱格式")
 	UserNameDuplicated = NewError(10004, "用户名已被注册")
 	EmailDuplicated    = NewError(10005, "邮箱已被注册")
+
+	// 图书模块
+	BookTitleDuplicated = NewError(20004, "书名以被注册")
+	BookISBNDuplicated  = NewError(20005, "ISBN已被注册")
 )

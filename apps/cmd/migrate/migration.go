@@ -11,5 +11,5 @@ func main() {
 	bootstrap.InitDB()
 
 	bootstrap.DB.AutoMigrate(model.User{})
-
+	bootstrap.DB.AutoMigrate(model.Book{})
 }

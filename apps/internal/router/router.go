@@ -6,11 +6,14 @@ import (
 )
 
 // SetupRouter 配置所有路由
-func SetupRouter(r *gin.Engine, userHandler *v1.UserHandler) {
+func SetupRouter(r *gin.Engine,
+	userHandler *v1.UserHandler,
+	bookHandler *v1.BookHandler,
+) {
 	// API v1 版本
 	apiV1 := r.Group("/api/v1")
 	{
 		SetupUserRoutes(apiV1, userHandler)
-		// SetupBookRoutes(apiV1, bookHandler)  // 未来扩展
+		SetupBookRoutes(apiV1, bookHandler)
 	}
 }
