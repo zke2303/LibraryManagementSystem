@@ -132,3 +132,31 @@ func (h *UserHandler) Delete(c *gin.Context) {
 
 	response.Success(c, nil)
 }
+
+// Update 更新用户信息
+// @Summary 更新用户信息
+// @Description 更新一个用户的信息
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param user body UpdateUserRequest true "用户新信息"
+func (h *UserHandler) Update(c *gin.Context) {
+	// 1.从请求中获取参数并验证
+	var req dto.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+
+	// 2.调用 service 层
+	if err := h.service.UpdateUser(&req); err != nil {
+		if errors.Is(err, errcode.UserNameDuplicated) {
+			response.BadRequest(c, errcode.UserNameDuplicated.Msg)
+			return
+		}
+		response.InternalError(c, errcode.InternalError.Msg)
+		return
+	}
+
+	response.Success(c, nil)
+}

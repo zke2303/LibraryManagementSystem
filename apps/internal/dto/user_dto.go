@@ -9,6 +9,16 @@ type CreateUserRequest struct {
 	Age      uint8  `json:"age" binding:"required,min=1,max=150"`
 }
 
+// UpdateUserRequest 更改用户信息请求
+type UpdateUserRequest struct {
+	Id       uint64  `json:"id" binding:"required"`
+	Username *string `json:"username" binding:"min=2,max=18"`
+	Password *string `json:"password" binding:"min=6,max=18"`
+	Email    *string `json:"email" binding:"email"`
+	Gender   *uint8  `json:"gender"`
+	Age      *uint8  `json:"age" binding:"min=1,max=150"`
+}
+
 // UserResponse 用户响应（不包含敏感信息）
 type UserResponse struct {
 	ID       uint   `json:"id"`

@@ -14,6 +14,7 @@ type IUserService interface {
 	CreateUser(user *model.User) error
 	CreateUserFromDTO(req *dto.CreateUserRequest) error
 	DeleteUser(id uint64) error
+	UpdateUser(req *dto.UpdateUserRequest) error
 }
 
 type UserServiceImpl struct {
@@ -60,5 +61,49 @@ func (s *UserServiceImpl) CreateUserFromDTO(req *dto.CreateUserRequest) error {
 
 // Delete 删除一个用户
 func (s *UserServiceImpl) DeleteUser(id uint64) error {
-	return s.repo.DeleteUser(id)
+	err := s.repo.DeleteUser(id)
+	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return errcode.NotFound
+		}
+		if errors.Is(err, repository.ErrInternal) {
+			return errcode.InternalError
+		}
+	}
+	return nil
+}
+
+// UpdateUser 更新用户信息
+func (s *UserServiceImpl) UpdateUser(req *dto.UpdateUserRequest) error {
+	// 将对象转换成 map
+	updates := make(map[string]interface{})
+	if req.Username != nil {
+		updates["username"] = *req.Username
+	}
+	if req.Password != nil {
+		updates["password"] = *req.Password
+	}
+	if req.Email != nil {
+		updates["email"] = *req.Email
+	}
+	if req.Gender != nil {
+		updates["gender"] = *req.Gender
+	}
+	if req.Age != nil {
+		updates["age"] = *req.Age
+	}
+
+	// 如何没有任何字段需要更新
+	if len(updates) == 0 {
+		return nil
+	}
+
+	err := s.repo.UpdateUser(req.Id, updates)
+	if errors.Is(err, repository.ErrNotFound) {
+		return errcode.NotFound
+	}
+	if errors.Is(err, repository.ErrInternal) {
+		return errcode.InternalError
+	}
+	return nil
 }
