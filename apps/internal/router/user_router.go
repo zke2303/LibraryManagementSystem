@@ -2,13 +2,14 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	v1 "github.com/zhang/LibraryMS/internal/api/v1"
+	v1 "github.com/zhang/LibraryMS/internal/handler/v1"
 )
 
-func UserRouter(r *gin.Engine, c v1.UserController) {
-	userRouter := r.Group("/api/user")
+// SetupUserRoutes 配置用户相关路由
+func SetupUserRoutes(rg *gin.RouterGroup, h *v1.UserHandler) {
+	users := rg.Group("/users")
 	{
-		userRouter.GET("", c.FindById) // 根据用户id查询用户信息
-		userRouter.POST("", c.CreateUser)
+		users.GET("/:id", h.GetByID) // 根据用户ID查询用户信息
+		users.POST("", h.Create)     // 创建用户
 	}
 }

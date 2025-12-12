@@ -13,7 +13,7 @@ type Configuration struct {
 
 type Server struct {
 	Host string `mapstructure:"host" json:"host" yaml:"host"`
-	Post string `mapstructure:"post" json:"post" yaml:"post"`
+	Port string `mapstructure:"port" json:"port" yaml:"port"`
 	Mode string `mapstructure:"mode" json:"mode" yaml:"mode"`
 }
 
@@ -32,6 +32,9 @@ func InitConfig() {
 	v.SetConfigName("config")
 	v.SetConfigType("yaml")
 	v.AddConfigPath("configs")
+
+	// 支持环境变量覆盖
+	v.AutomaticEnv()
 
 	err := v.ReadInConfig()
 	if err != nil {

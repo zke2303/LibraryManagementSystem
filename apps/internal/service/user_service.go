@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 
+	"github.com/zhang/LibraryMS/internal/dto"
 	"github.com/zhang/LibraryMS/internal/model"
 	"github.com/zhang/LibraryMS/internal/pkg/errcode"
 	"github.com/zhang/LibraryMS/internal/repository"
@@ -11,30 +12,28 @@ import (
 type IUserService interface {
 	FindById(id uint64) (*model.User, error)
 	CreateUser(user *model.User) error
+	CreateUserFromDTO(req *dto.CreateUserRequest) error
 }
 
 type UserServiceImpl struct {
 	repo repository.IUserRepository
 }
 
-// NewIUserService
-// 创建 IUserSservice 示例
+// NewIUserService 创建 IUserService 实例
 func NewIUserService(repo repository.IUserRepository) IUserService {
 	return &UserServiceImpl{
 		repo: repo,
 	}
 }
 
-// FindById
-// 根据用户id查询用户
-func (service *UserServiceImpl) FindById(id uint64) (*model.User, error) {
-	return service.repo.FindById(id)
+// FindById 根据用户ID查询用户
+func (s *UserServiceImpl) FindById(id uint64) (*model.User, error) {
+	return s.repo.FindById(id)
 }
 
-// CreateUser
-// 创建一个新用户
-func (service *UserServiceImpl) CreateUser(user *model.User) error {
-	err := service.repo.CreateUser(user)
+// CreateUser 创建一个新用户
+func (s *UserServiceImpl) CreateUser(user *model.User) error {
+	err := s.repo.CreateUser(user)
 	if err != nil {
 		switch {
 		case errors.Is(err, repository.ErrDuplicateKey):
@@ -44,4 +43,16 @@ func (service *UserServiceImpl) CreateUser(user *model.User) error {
 		}
 	}
 	return nil
+}
+
+// CreateUserFromDTO 从 DTO 创建用户
+func (s *UserServiceImpl) CreateUserFromDTO(req *dto.CreateUserRequest) error {
+	user := &model.User{
+		Username: req.Username,
+		Password: req.Password,
+		Email:    req.Email,
+		Gender:   model.Gender(req.Gender),
+		Age:      req.Age,
+	}
+	return s.CreateUser(user)
 }
