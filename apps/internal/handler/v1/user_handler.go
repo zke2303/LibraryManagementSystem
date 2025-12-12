@@ -173,3 +173,35 @@ func (h *UserHandler) Update(c *gin.Context) {
 	// 3. 返回成功信息
 	response.Success(c, nil)
 }
+
+// GetByUsername 根据username查询用户信息
+// @Summary 根据username查询用户信息
+// @Description 根据username查询用户信息
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param query username true "username"
+// @Success 200 {boject} response.Response
+// @Router /api/v1/user/ [get]
+func (h *UserHandler) GetByUsername(c *gin.Context) {
+	// 1.从请求中获取参数
+	username := c.Query("username")
+	if username == "" {
+		response.BadRequest(c, errcode.MissingParams.Msg)
+		return
+	}
+
+	// 2.调用 service 层
+	user, err := h.service.GetByUsername(username)
+	if err != nil {
+		if errors.Is(err, errcode.NotFound) {
+			response.NotFound(c, errcode.NotFound.Msg)
+			return
+		}
+		response.InternalError(c, errcode.InternalError.Msg)
+		return
+	}
+
+	// 3.查询成功，返回查询信息
+	response.Success(c, *user)
+}
