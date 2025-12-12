@@ -1,6 +1,9 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	v1 "github.com/zhang/LibraryMS/internal/api/v1"
+)
 
 func UserRouter(r *gin.Engine, c v1.UserController) {
 	userRouter := r.Group("/user")
