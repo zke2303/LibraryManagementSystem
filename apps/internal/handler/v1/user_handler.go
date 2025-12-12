@@ -136,3 +136,40 @@ func (h *UserHandler) Delete(c *gin.Context) {
 
 	response.Success(c, nil)
 }
+
+// Update 更新用户信息
+// @Summary 更新用户信息
+// @Description 更新用户信息
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param user body dto.UpdateUserRequest true "用户信息"
+// @Success 200 {boject} response.Response
+// @Router /api/v1/user/ [put]
+func (h *UserHandler) Update(c *gin.Context) {
+	// 1. 从请求中获取请求参数并验证
+	var req dto.UpdateUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, err.Error())
+		return
+	}
+
+	// 2. 调用 service 层
+	if err := h.service.UpdateUser(&req); err != nil {
+		if errors.Is(err, errcode.UserNameDuplicated) {
+			response.BadRequest(c, errcode.UserNameDuplicated.Msg)
+			return
+		} else if errors.Is(err, errcode.EmailDuplicated) {
+			response.BadRequest(c, errcode.EmailDuplicated.Msg)
+			return
+		} else if errors.Is(err, errcode.NotFound) {
+			response.BadRequest(c, errcode.NotFound.Msg)
+			return
+		}
+		response.InternalError(c, errcode.InternalError.Msg)
+		return
+	}
+
+	// 3. 返回成功信息
+	response.Success(c, nil)
+}

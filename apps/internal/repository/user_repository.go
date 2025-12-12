@@ -13,6 +13,7 @@ type IUserRepository interface {
 	FindById(id uint64) (*model.User, error)
 	CreateUser(user *model.User) error
 	DeleteUser(id uint64) error
+	UpdateUser(id uint64, updates map[string]interface{}) error
 }
 
 type UserRepositoryImpl struct {
@@ -71,5 +72,25 @@ func (repo UserRepositoryImpl) DeleteUser(id uint64) error {
 		return errcode.NotFound
 	}
 
+	return nil
+}
+
+// UpdateUser
+// 更新用户信息
+func (repo UserRepositoryImpl) UpdateUser(id uint64, updates map[string]interface{}) error {
+	// 1.执行数据库操作
+	result := repo.db.Model(model.User{}).Where("id = ?", id).Updates(updates)
+	err := result.Error
+	var mysqlErr *mysql.MySQLError
+	if err != nil {
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return err
+		}
+		return errcode.InternalError
+	}
+
+	if result.RowsAffected == 0 {
+		return errcode.NotFound
+	}
 	return nil
 }
