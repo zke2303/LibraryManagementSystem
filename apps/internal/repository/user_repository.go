@@ -3,13 +3,19 @@ package repository
 import (
 	"errors"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/zhang/LibraryMS/internal/model"
 	"github.com/zhang/LibraryMS/internal/pkg/errcode"
 	"gorm.io/gorm"
 )
 
+var (
+	ErrDuplicateKey = errors.New("duplicate key")
+)
+
 type IUserRepository interface {
 	FindById(id uint64) (*model.User, error)
+	CreateUser(user *model.User) error
 }
 
 type UserRepositoryImpl struct {
@@ -35,7 +41,21 @@ func (repo UserRepositoryImpl) FindById(id uint64) (*model.User, error) {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errcode.NotFound
 		}
-		return nil, err
+		return nil, errcode.InternalError
 	}
 	return &user, nil
+}
+
+// CreateUser
+// 创建一个新用户
+func (repo UserRepositoryImpl) CreateUser(user *model.User) error {
+	// 1.调用数据库操作
+	if err := repo.db.Create(user).Error; err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+			return ErrDuplicateKey
+		}
+		return err
+	}
+	return nil
 }

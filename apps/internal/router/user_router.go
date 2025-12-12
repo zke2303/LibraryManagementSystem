@@ -6,8 +6,9 @@ import (
 )
 
 func UserRouter(r *gin.Engine, c v1.UserController) {
-	userRouter := r.Group("/user")
+	userRouter := r.Group("/api/user")
 	{
 		userRouter.GET("", c.FindById) // 根据用户id查询用户信息
+		userRouter.POST("", c.CreateUser)
 	}
 }

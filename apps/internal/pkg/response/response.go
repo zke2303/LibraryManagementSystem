@@ -12,6 +12,10 @@ type Result struct {
 }
 
 func Success(c *gin.Context, data interface{}) {
+	if data == nil {
+		c.JSON(200, gin.H{})
+	}
+
 	c.JSON(200, Result{
 		Code: 200,
 		Msg:  "success",
