@@ -93,3 +93,42 @@ func (h *UserHandler) Create(c *gin.Context) {
 	// 3. 返回成功信息
 	response.Success(c, nil)
 }
+
+// Delete 删除用户
+// @Summary 删除用户
+// @Description 删除用户
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param id path int true "用户id"
+// @Success 200 {boject} response.Response
+// @Router /api/v1/user/{id} [delete]
+func (h *UserHandler) Delete(c *gin.Context) {
+	// 1.从请求中获取参数
+	idStr := c.Param("id")
+	if idStr == "" {
+		response.BadRequest(c, errcode.MissingParams.Msg)
+		return
+	}
+
+	// 2.将其转换成uint64格式
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		response.BadRequest(c, errcode.InvalidParams.Msg)
+		return
+	}
+
+	// 3.调用 service 层
+	if err := h.service.DeleteUser(id); err != nil {
+		// 没有这条记录， 无法删除
+		if errors.Is(err, errcode.NotFound) {
+			response.NotFound(c, errcode.NotFound.Msg)
+			return
+		}
+		// 其他错误
+		response.InternalError(c, errcode.InternalError.Msg)
+		return
+	}
+
+	response.Success(c, nil)
+}

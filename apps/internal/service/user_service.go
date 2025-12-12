@@ -13,6 +13,7 @@ type IUserService interface {
 	FindById(id uint64) (*model.User, error)
 	CreateUser(user *model.User) error
 	CreateUserFromDTO(req *dto.CreateUserRequest) error
+	DeleteUser(id uint64) error
 }
 
 type UserServiceImpl struct {
@@ -55,4 +56,9 @@ func (s *UserServiceImpl) CreateUserFromDTO(req *dto.CreateUserRequest) error {
 		Age:      req.Age,
 	}
 	return s.CreateUser(user)
+}
+
+// Delete 删除一个用户
+func (s *UserServiceImpl) DeleteUser(id uint64) error {
+	return s.repo.DeleteUser(id)
 }

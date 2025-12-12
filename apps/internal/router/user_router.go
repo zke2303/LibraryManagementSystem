@@ -9,7 +9,8 @@ import (
 func SetupUserRoutes(rg *gin.RouterGroup, h *v1.UserHandler) {
 	users := rg.Group("/users")
 	{
-		users.GET("/:id", h.GetByID) // 根据用户ID查询用户信息
-		users.POST("", h.Create)     // 创建用户
+		users.GET("/:id", h.GetByID)   // 根据用户ID查询用户信息
+		users.POST("", h.Create)       // 创建用户
+		users.DELETE("/:id", h.Delete) // 删除用户
 	}
 }
