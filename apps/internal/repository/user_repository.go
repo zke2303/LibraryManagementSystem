@@ -14,6 +14,7 @@ type IUserRepository interface {
 	CreateUser(user *model.User) error
 	DeleteUser(id uint64) error
 	UpdateUser(id uint64, updates map[string]interface{}) error
+	GetByUsername(username string) (*model.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -93,4 +94,20 @@ func (repo UserRepositoryImpl) UpdateUser(id uint64, updates map[string]interfac
 		return errcode.NotFound
 	}
 	return nil
+}
+
+// GetByUsername
+// 根据username查询用户信息
+func (repo UserRepositoryImpl) GetByUsername(username string) (*model.User, error) {
+	// 1.进行数据库操作
+	var user model.User
+	if err := repo.db.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errcode.NotFound
+		}
+		return nil, errcode.InternalError.Wrap(err)
+	}
+
+	// 2.查询成功，返回查询信息
+	return &user, nil
 }

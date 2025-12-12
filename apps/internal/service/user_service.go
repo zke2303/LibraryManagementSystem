@@ -15,6 +15,7 @@ type IUserService interface {
 	CreateUserFromDTO(req *dto.CreateUserRequest) error
 	DeleteUser(id uint64) error
 	UpdateUser(req *dto.UpdateUserRequest) error
+	GetByUsername(username string) (*model.User, error)
 }
 
 type UserServiceImpl struct {
@@ -102,4 +103,11 @@ func (s *UserServiceImpl) UpdateUser(req *dto.UpdateUserRequest) error {
 		}
 	}
 	return nil
+}
+
+// GetByUsername
+// 根据username查询用户信息
+func (service UserServiceImpl) GetByUsername(username string) (*model.User, error) {
+	// 1.调用 repository 层
+	return service.repo.GetByUsername(username)
 }
